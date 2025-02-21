@@ -891,6 +891,14 @@ public class BadgeViewModel : ViewModelBase
                 }
 
                 List<string> splited = beingProcessedLine.SeparateTail ();
+                //List<string> splited = beingProcessedLine.Split ();
+
+
+                string str = "fdfdf-dfdfd-fdfdf-dfdfd";
+
+
+
+
 
                 if ( (splited.Count > 0)   &&   textAtom.IsSplitable )
                 {

@@ -10,21 +10,23 @@ namespace ExtentionsAndAuxiliary
     {
         public static List<string> SeparateTail ( this string str )
         {
-            List<string> result = new List<string> ();
-
-            if ( str == null ) 
+            if ( string.IsNullOrWhiteSpace(str) ) 
             {
-                return result;
+                return new ();
             }
 
-            for ( var index = str.Length - 1;   index >= 0;   index-- )
+            List<string> result = new (2);
+
+            for ( int index = str.Length - 1;   index >= 0;   index-- )
             {
                 if ( (str [index] == ' ')   ||   (str [index] == '-') )
                 {
                     int gapLength = 1;
                     int endPartLength = str.Length - index - gapLength;
-                    string secondPart = str.Substring (index + 1, endPartLength);
+
+                    string secondPart = str.Substring (index + gapLength, endPartLength);
                     string firstPart = str.Substring (0, index);
+
                     result.Add (firstPart);
                     result.Add (secondPart);
 
@@ -33,47 +35,6 @@ namespace ExtentionsAndAuxiliary
             }
 
             return result;
-        }
-
-
-        public static double TranslateToDoubleOrZeroIfNot ( this string possibleDouble )
-        {
-            double result = 0;
-
-            if ( possibleDouble == null )
-            {
-                return 0;
-            }
-
-            try
-            {
-                result = Double.Parse (possibleDouble);
-            }
-            catch ( FormatException ex )
-            {
-                return 0;
-            }
-
-            return result;
-        }
-
-
-        public static string TrimLastSpaceOrQuoting ( this string beingProcessed )
-        {
-            bool isNotEmpty = ! string.IsNullOrEmpty (beingProcessed);
-
-            if ( isNotEmpty ) 
-            {
-                char lastChar = beingProcessed [beingProcessed.Length - 1];
-                bool isGoal = ( lastChar == ' ' )   ||   ( lastChar == '"' );
-
-                if ( isGoal )
-                {
-                    beingProcessed = beingProcessed.Substring (0, beingProcessed.Length - 1);
-                }
-            }
-
-            return beingProcessed;
         }
 
 
@@ -245,55 +206,4 @@ namespace ExtentionsAndAuxiliary
             }
         }
     }
-
-
-
-    public class RusStringComparer <T> : IComparer<T>
-    {
-        public int Compare ( T first, T second )
-        {
-            int result = -1;
-
-            if ( typeof (T).FullName == "ContentAssembler.Person" )
-            {
-                Person firstPerson = first as Person;
-                Person secondPerson = second as Person;
-
-                string firstStr = firstPerson.FullName;
-                string secondStr = secondPerson.FullName;
-
-                for ( int index = 0; index < firstStr.Length; index++ )
-                {
-                    char firstChar = firstStr [index];
-
-                    if ( index > ( secondStr.Length - 1 ) )
-                    {
-                        return 1;
-                    }
-
-                    char secondChar = secondStr [index];
-                    int firstInt = ( int ) firstChar;
-                    int secondInt = ( int ) secondChar;
-
-                    if ( firstInt < secondInt )
-                    {
-                        result = -1;
-                        break;
-                    }
-                    else if ( firstInt == secondInt )
-                    {
-                        result = 0;
-                    }
-                    else
-                    {
-                        result = 1;
-                        break;
-                    }
-                }
-            }
-
-            return result;
-        }
-    }
-
 }

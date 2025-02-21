@@ -173,18 +173,6 @@ namespace DataGateway
         }
 
 
-        public static string ? GetSectionValue ( IConfigurationSection section )
-        {
-            if( section == null ) 
-            {
-                return null; 
-            }
-
-            string result = section.Value;
-            return result;
-        }
-
-
         public static IEnumerable <IConfigurationSection> GetIncludedItemsOfSection
                                                                           ( List<string> keyPathOfSection, string jsonPath )
         {

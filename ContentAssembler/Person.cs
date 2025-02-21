@@ -15,10 +15,11 @@ namespace ContentAssembler
         public string FullName
         {
             get
-            { string view = string.Empty;
-                AppendNameInView (FamilyName, ref view);
-                AppendNameInView (FirstName, ref view);
-                AppendNameInView (PatronymicName, ref view);
+            { 
+                string view = string.Empty;
+                view = AppendNameInView (FamilyName, view);
+                view = AppendNameInView (FirstName, view);
+                view = AppendNameInView (PatronymicName, view);
                 return view;
             }
         }
@@ -136,9 +137,8 @@ namespace ContentAssembler
         }
 
 
-        private void AppendNameInView ( string namePart, ref string view ) 
+        private string AppendNameInView ( string namePart, string view ) 
         {
-
             if ( ! string.IsNullOrWhiteSpace (namePart) )
             {
                 if ( ! string.IsNullOrWhiteSpace (view) )
@@ -148,6 +148,8 @@ namespace ContentAssembler
 
                 view += namePart;
             }
+
+            return view;
         }
     }
 }

@@ -52,8 +52,8 @@ namespace Lister.ViewModels
 
 
         public PersonChoosingViewModel ( string placeHolder, int inputLimit
-                                        , SolidColorBrush incorrectTemplateColor, List <SolidColorBrush> defaultColors
-                                        , List <SolidColorBrush> focusedColors, List <SolidColorBrush> selectedColors )
+                                        , SolidColorBrush incorrectTemplateColor, List<SolidColorBrush> defaultColors
+                                        , List<SolidColorBrush> focusedColors, List<SolidColorBrush> selectedColors )
         {
             _inputLimit = inputLimit;
 
@@ -71,7 +71,7 @@ namespace Lister.ViewModels
             _focusedBackgroundColor = focusedColors [0];
             _focusedBorderColor = focusedColors [1];
 
-            VisiblePeople = new ObservableCollection <VisiblePerson> ();
+            VisiblePeople = new ObservableCollection<VisiblePerson> ();
             ScrollerCanvasLeft = _withScroll;
             PersonsScrollValue = _oneHeight;
             TextboxIsReadOnly = true;
@@ -99,9 +99,9 @@ namespace Lister.ViewModels
         }
 
 
-        internal void SetPersonsFromFile ( string ? path )
+        internal void SetPersonsFromFile ( string? path )
         {
-            bool valueIsSuitable = ! string.IsNullOrWhiteSpace (path);
+            bool valueIsSuitable = !string.IsNullOrWhiteSpace (path);
 
             if ( valueIsSuitable )
             {
@@ -109,11 +109,11 @@ namespace Lister.ViewModels
 
                 try
                 {
-                    List <Person> persons = documentAssembler.GetPersons (path);
+                    List<Person> persons = documentAssembler.GetPersons (path);
                     SetPersonsFromNewSource (persons);
                     SwitchPersonChoosingEnabling (true);
                 }
-                catch ( Exception ex ) 
+                catch ( Exception ex )
                 {
                     FileNotFound = true;
                     SetPersonsFromNewSource (null);
@@ -130,7 +130,7 @@ namespace Lister.ViewModels
 
         private void SwitchPersonChoosingEnabling ( bool shouldEnable )
         {
-            TextboxIsReadOnly = ! shouldEnable;
+            TextboxIsReadOnly = !shouldEnable;
             TextboxIsFocusable = shouldEnable;
         }
 
@@ -171,7 +171,7 @@ namespace Lister.ViewModels
 
         internal void HideDropListWithoutChange ()
         {
-            if ( (( InvolvedPeople. Count == 0 )   &&   ( PeopleStorage. Count > 0 ))   ||   _choiceIsAbsent )
+            if ( ( ( InvolvedPeople.Count == 0 ) && ( PeopleStorage.Count > 0 ) ) || _choiceIsAbsent )
             {
                 RecoverVisiblePeople ();
                 ShowDropDown ();
@@ -212,35 +212,22 @@ namespace Lister.ViewModels
         }
         #endregion
 
-
-        private void SetPersonsFromNewSource ( List <Person> ? persons )
+        private void SetPersonsFromNewSource ( List<Person>? people )
         {
-            if ( persons == null )
+            if ( people == null )
             {
                 return;
             }
 
-            List <Person> sortablePersons = persons.Clone ();
-            IComparer <Person> comparer = new RusStringComparer <Person> ();
-            sortablePersons.Sort (comparer);
+            List<VisiblePerson> visiblePeople = people.Clone ()
+                 .Where (person => ! person.IsEmpty ())
+                 .Select (person => new VisiblePerson (person))
+                 .OrderBy (person => person.Person.FullName)
+                 .ToList ();
 
-            List <VisiblePerson> peopleStorage = new ();
-            List <VisiblePerson> involvedPeople = new ();
+            PeopleStorage = visiblePeople;
+            InvolvedPeople = visiblePeople;
 
-            foreach ( Person person   in   sortablePersons )
-            {
-                if ( person.IsEmpty () )
-                {
-                    continue;
-                }
-
-                VisiblePerson visiblePerson = new VisiblePerson (person);
-                peopleStorage.Add (visiblePerson);
-                involvedPeople.Add (visiblePerson);
-            }
-
-            PeopleStorage = peopleStorage;
-            InvolvedPeople = involvedPeople;
             ChosenPerson = null;
         }
 
@@ -263,7 +250,7 @@ namespace Lister.ViewModels
                 seekingScratch = InvolvedPeople.Count;
             }
 
-            for ( int index = seekingScratch;   index <= seekingEnd;   index++ )
+            for ( int index = seekingScratch; index <= seekingEnd; index++ )
             {
                 VisiblePerson foundPerson = InvolvedPeople [index];
                 bool isCoincidence = person.Equals (foundPerson.Person);
@@ -282,7 +269,7 @@ namespace Lister.ViewModels
 
                     SetSelectedToNull ();
                     _focused = foundPerson;
-                    
+
                     _focusedNumber = index;
                     PlaceHolder = personName;
                     EntireFontWeight = FontWeight.Normal;
@@ -339,7 +326,7 @@ namespace Lister.ViewModels
         }
 
 
-        internal Person ? FindPersonByStringPresentation ( string presentation )
+        internal Person? FindPersonByStringPresentation ( string presentation )
         {
             if ( string.IsNullOrWhiteSpace (presentation) )
             {
@@ -348,7 +335,7 @@ namespace Lister.ViewModels
 
             Person result = null;
 
-            foreach ( VisiblePerson person   in   InvolvedPeople )
+            foreach ( VisiblePerson person in InvolvedPeople )
             {
                 bool isIntresting = person.Person.IsMatchingTo (presentation);
 
@@ -408,7 +395,7 @@ namespace Lister.ViewModels
             FirstItemHeight = _scrollingScratch;
             PersonsScrollValue = _scrollingScratch;
 
-            if ( _focused != null ) 
+            if ( _focused != null )
             {
                 _focused.IsFocused = false;
                 _focused.IsSelected = false;
@@ -451,7 +438,7 @@ namespace Lister.ViewModels
             VisiblePeople.Clear ();
             int limit = Math.Min (InvolvedPeople.Count, _maxVisibleCount);
 
-            for ( int index = 0;   index < limit;   index++ )
+            for ( int index = 0; index < limit; index++ )
             {
                 int personIndex = scratch + index;
                 VisiblePeople.Add (InvolvedPeople [personIndex]);
@@ -459,7 +446,7 @@ namespace Lister.ViewModels
         }
 
 
-        internal void SetInvolvedPeople ( List <VisiblePerson> involvedPeople )
+        internal void SetInvolvedPeople ( List<VisiblePerson> involvedPeople )
         {
             SetSelectedToNull ();
             InvolvedPeople = involvedPeople;
@@ -507,7 +494,7 @@ namespace Lister.ViewModels
         {
             if ( ( InvolvedPeople != null ) && ( InvolvedPeople.Count > 0 ) )
             {
-                bool areReady = ( SinglePersonIsSelected || EntireIsSelected )   &&   ( ChosenTemplate != null );
+                bool areReady = ( SinglePersonIsSelected || EntireIsSelected ) && ( ChosenTemplate != null );
 
                 if ( areReady )
                 {
@@ -542,9 +529,9 @@ namespace Lister.ViewModels
                 return;
             }
 
-            List <VisiblePerson> foundVisiblePeople = new List <VisiblePerson> ();
+            List<VisiblePerson> foundVisiblePeople = new List<VisiblePerson> ();
 
-            foreach ( VisiblePerson person   in   PeopleStorage )
+            foreach ( VisiblePerson person in PeopleStorage )
             {
                 person.IsFocused = false;
 
@@ -583,9 +570,9 @@ namespace Lister.ViewModels
             SinglePersonIsSelected = false;
 
             _scrollValue = _scrollingScratch;
-            List <VisiblePerson> recovered = new List <VisiblePerson> ();
+            List<VisiblePerson> recovered = new List<VisiblePerson> ();
 
-            foreach ( VisiblePerson person   in   PeopleStorage )
+            foreach ( VisiblePerson person in PeopleStorage )
             {
                 person.IsFocused = false;
                 recovered.Add (person);
@@ -617,9 +604,9 @@ namespace Lister.ViewModels
                 incorrectColor = new SolidColorBrush (new Avalonia.Media.Color (100, 255, 255, 255));
             }
 
-            ObservableCollection <TemplateViewModel> templates = new ();
+            ObservableCollection<TemplateViewModel> templates = new ();
 
-            foreach ( KeyValuePair<BadgeLayout, KeyValuePair<string, List<string>>> layout   in   _badgeLayouts )
+            foreach ( KeyValuePair<BadgeLayout, KeyValuePair<string, List<string>>> layout in _badgeLayouts )
             {
                 KeyValuePair<string, List<string>> sourceAndErrors = layout.Value;
                 bool correctLayoutHasEmptyMessage = ( sourceAndErrors.Value.Count < 1 );
@@ -710,7 +697,7 @@ namespace Lister.ViewModels
             {
                 Color = colorIfCorrect;
             }
-            else 
+            else
             {
                 Color = colorIfIncorrect;
             }

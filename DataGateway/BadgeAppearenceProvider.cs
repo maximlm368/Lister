@@ -5,6 +5,7 @@ using NJsonSchema;
 using NJsonSchema.Validation;
 using System.Drawing.Text;
 using System.Text;
+using static System.Collections.Specialized.BitVector32;
 
 
 namespace DataGateway
@@ -412,8 +413,7 @@ namespace DataGateway
             foreach ( IConfigurationSection item   in   items )
             {
                 string path = item.Path;
-
-                string numberStr = GetterFromJson.GetSectionValue (item.GetSection ("Number"));
+                string numberStr = item.GetSection ("Number")?.Value;
 
                 int number = 0;
                 number = DigitalStringParser.ParseToInt (numberStr);
@@ -498,10 +498,9 @@ namespace DataGateway
         private TextualAtom BuildTextualAtom 
                         ( IConfigurationSection section, string jsonPath, List<string> united, int numberToLocate )
         {
-            IConfigurationSection childSection = section.GetSection ("Name");
-            string atomName = GetterFromJson.GetSectionValue (childSection) ?? "";
+            string atomName = section.GetSection ("Name")?.Value ?? "";
 
-            childSection = section.GetSection ("Width");
+            IConfigurationSection childSection = section.GetSection ("Width");
             double width = GetSectionIntValueOrDefault (childSection, jsonPath, "Width");
 
             childSection = section.GetSection ("Height");
@@ -528,8 +527,7 @@ namespace DataGateway
             childSection = section.GetSection ("FontWeight");
             string fontWeight = GetSectionStrValueOrDefault (childSection, jsonPath, "FontWeight");
 
-            childSection = section.GetSection ("IsSplitable");
-            string shiftableString = GetterFromJson.GetSectionValue (childSection) ?? _defaultSplitability;
+            string shiftableString = section.GetSection ("IsSplitable")?.Value ?? _defaultSplitability;
             bool isShiftable = false;
 
             int shiftableInt = DigitalStringParser.ParseToInt (shiftableString);
@@ -543,17 +541,14 @@ namespace DataGateway
 
         private InsideImage BuildInsideImage ( IConfigurationSection section )
         {
-            List<double> commonData = GetCommonData (section);
+            double [] commonData = GetCommonData (section);
 
-            IConfigurationSection childSection = section.GetSection ( "Path" );
-            string fileName = GetterFromJson.GetSectionValue ( childSection) ?? "";
+            string fileName = section.GetSection ("Path")?.Value ?? "";
             string fileUri = _resourceFolder + fileName;
 
-            childSection = section.GetSection ("BindingObject");
-            string bindingObjectName = GetterFromJson.GetSectionValue (childSection) ?? "";
+            string bindingObjectName = section.GetSection ("BindingObject")?.Value ?? "";
 
-            childSection = section.GetSection ("IsAboveOfBinding");
-            string isAbove = GetterFromJson.GetSectionValue (childSection) ?? "";
+            string isAbove = section.GetSection ("IsAboveOfBinding")?.Value ?? "";
 
             bool isAboveOfBinding = false;
 
@@ -570,19 +565,12 @@ namespace DataGateway
 
         private InsideShape BuildInsideShape ( IConfigurationSection section )
         {
-            List<double> commonData = GetCommonData (section);
+            double [] commonData = GetCommonData (section);
 
-            IConfigurationSection childSection = section.GetSection ("Type");
-            string kind = GetterFromJson.GetSectionValue (childSection) ?? "";
-
-            childSection = section.GetSection ("FillColor");
-            string fillColor = GetterFromJson.GetSectionValue (childSection) ?? "#000000";
-
-            childSection = section.GetSection ("BindingObject");
-            string bindingObjectName = GetterFromJson.GetSectionValue (childSection) ?? "";
-
-            childSection = section.GetSection ("IsAboveOfBinding");
-            string isAbove = GetterFromJson.GetSectionValue (childSection) ?? "";
+            string kind = section.GetSection ("Type")?.Value ?? "";
+            string fillColor = section.GetSection ("FillColor")?.Value ?? "#000000";
+            string bindingObjectName = section.GetSection ("BindingObject")?.Value ?? "";
+            string isAbove = section.GetSection ("IsAboveOfBinding")?.Value ?? "";
 
             bool isAboveOfBinding = false;
 
@@ -598,25 +586,14 @@ namespace DataGateway
         }
 
 
-        private List<double> GetCommonData ( IConfigurationSection section )
+        private double[] GetCommonData ( IConfigurationSection section )
         {
-            List<double> result = new ();
+            double[] result = new double [4];
 
-            IConfigurationSection childSection = section.GetSection ("Width");
-            double width = GetterFromJson.GetSectionValue (childSection).TranslateToDoubleOrZeroIfNot ();
-            result.Add ( width );
-
-            childSection = section.GetSection ("Height");
-            double height = GetterFromJson.GetSectionValue (childSection).TranslateToDoubleOrZeroIfNot ();
-            result.Add (height);
-
-            childSection = section.GetSection ("TopOffset");
-            double topOffset = GetterFromJson.GetSectionValue (childSection).TranslateToDoubleOrZeroIfNot ();
-            result.Add ( topOffset );
-
-            childSection = section.GetSection ("LeftOffset");
-            double leftOffset = GetterFromJson.GetSectionValue (childSection).TranslateToDoubleOrZeroIfNot ();
-            result.Add (leftOffset);
+            double.TryParse (section.GetSection ("Width")?.Value, out result [0]);
+            double.TryParse(section.GetSection ("Height")?.Value, out result [1]);
+            double.TryParse (section.GetSection ("TopOffset")?.Value, out result [2]);
+            double.TryParse (section.GetSection ("LeftOffset")?.Value, out result [3]);
 
             return result;
         }
@@ -1040,7 +1017,7 @@ namespace DataGateway
                 return strValue;
             }
 
-            return GetterFromJson.GetSectionValue (section);
+            return section.Value;
         }
 
 
@@ -1072,7 +1049,7 @@ namespace DataGateway
                 return DigitalStringParser.ParseToInt(strValue);
             }
 
-            return DigitalStringParser.ParseToInt (GetterFromJson.GetSectionValue (section));
+            return DigitalStringParser.ParseToInt (section.Value);
         }
 
 
@@ -1113,14 +1090,7 @@ namespace DataGateway
                 return result;
             }
 
-            bool sectionValueIsTrue = ( GetterFromJson.GetSectionValue (section) == "true" )
-                                      ||
-                                      ( GetterFromJson.GetSectionValue (section) == "True" );
-
-            if ( sectionValueIsTrue )
-            {
-                result = true;
-            }
+            result = string.Equals (section?.Value, "true", StringComparison.CurrentCultureIgnoreCase);
 
             return result;
         }

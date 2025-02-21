@@ -96,8 +96,6 @@ public partial class App : Avalonia.Application
         if ( ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop )
         {
             SplashWindow splashWindow = new SplashWindow ();
-            SplashViewModel splashViewModel = new SplashViewModel ();
-            splashWindow.DataContext = splashViewModel;
             desktop.MainWindow = splashWindow;
             splashWindow.Show ();
 
